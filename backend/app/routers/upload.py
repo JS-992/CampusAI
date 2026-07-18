@@ -1,32 +1,52 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from pathlib import Path
+from fastapi import APIRouter, UploadFile, File, Form, Depends
+from sqlalchemy.orm import Session
+import os
 import shutil
-from app.config import settings
 
-router = APIRouter()
+from app.database.connection import get_db
+from app.crud.material import create_material
+from app.schemas.material import MaterialResponse
 
-@router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    allowed_extensions = [".pdf", ".ppt", ".pptx"]
 
-    filename = file.filename.lower()
+router = APIRouter(
+    prefix="/upload",
+    tags=["Upload"]
+)
 
-    if not any(filename.endswith(ext) for ext in allowed_extensions):
-        raise HTTPException(
-            status_code=400,
-            detail="Only PDF, PPT and PPTX files are allowed."
-        )
-    
-    upload_dir = Path(settings.UPLOAD_FOLDER)
-    upload_dir.mkdir(exist_ok=True)
 
-    file_path = upload_dir / file.filename
+UPLOAD_DIR = "uploads"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@router.post("/", response_model=MaterialResponse)
+def upload_file(
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    subject_id: int = Form(...),
+    db: Session = Depends(get_db)
+):
+
+    file_path = os.path.join(
+        UPLOAD_DIR,
+        file.filename
+    )
 
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
 
-    return {
-        "status": "success",
-        "filename": file.filename
-    }
-    
+    file_type = file.content_type
+
+    material = create_material(
+        db=db,
+        title=title,
+        file_name=file.filename,
+        file_path=file_path,
+        file_type=file_type,
+        subject_id=subject_id
+    )
+
+    return material

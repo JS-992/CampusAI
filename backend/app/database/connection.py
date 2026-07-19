@@ -13,11 +13,7 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 Base = declarative_base()
-from app.models.regulation import Regulation
-from app.models.subject import Subject
-from app.models.semester import Semester
-from app.models.material import Material
-from app.models.previous_paper import PreviousPaper
+from app.database import base
 
 Base.metadata.create_all(bind=engine)
 def get_db():

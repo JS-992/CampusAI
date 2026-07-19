@@ -12,6 +12,7 @@ from app.routers import semester
 from app.routers import subject
 from app.routers import material
 from app.routers import previous_paper
+from app.routers import process_material
 
 app = FastAPI(
 
@@ -35,3 +36,4 @@ app.include_router(semester.router)
 app.include_router(subject.router)
 app.include_router(material.router)
 app.include_router(previous_paper.router)
+app.include_router(process_material.router)

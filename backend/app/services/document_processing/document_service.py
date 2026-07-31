@@ -63,16 +63,14 @@ def process_material(
     raw_text = extract_text_from_document(
         material.file_path
     )
-    print("FILE PATH:", material.file_path)
-    print("RAW TEXT LENGTH:", len(raw_text))
-    print("RAW TEXT PREVIEW:", raw_text[:200])
+    
     cleaned_text = clean_text(raw_text)
 
-    print("CLEANED TEXT LENGTH:", len(cleaned_text))
+    
     chunks = split_text_into_chunks(
         cleaned_text
     )
-    print("NUMBER OF CHUNKS:", len(chunks))
+    
     for index, chunk in enumerate(chunks):
 
         document_chunk = DocumentChunk(

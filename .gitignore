@@ -30,3 +30,5 @@ uploads/
 # -------------------------------
 .DS_Store
 Thumbs.db
+tests/
+chroma_db/
